@@ -1,0 +1,141 @@
+
+#include <ros/ros.h>
+#include <geometry_msgs/Twist.h>
+#include <turtlesim/Pose.h>
+#include<turtlesim/Spawn.h>
+#include<cstdlib>
+#include<cmath>
+#include <iostream>
+#include <algorithm>
+#include<iomanip>
+using namespace std;
+
+ros::Publisher pub[100];
+ros::Subscriber sub[100];
+geometry_msgs::Twist msg[3];
+const float PI = 3.14159265;
+float rate = 100;
+turtlesim::Pose current_pose[10];
+
+geometry_msgs::Twist getMessage(double linear_x, double angular_z)
+{
+    geometry_msgs::Twist msg;
+    msg.linear.x = linear_x;
+    msg.angular.z = angular_z;
+    return msg;
+}
+
+void poseCallback1(const turtlesim::Pose::ConstPtr& msg)
+{   
+   
+    current_pose[0] = *msg;
+   
+}
+
+void poseCallback2(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[1] = *msg;
+    
+}
+
+void poseCallback3(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[2] = *msg;
+    
+}
+
+int main(int argc, char** argv)
+{
+      ros::init(argc, argv, "myturtle_control");
+     ros::NodeHandle h;
+     pub[1] = h.advertise<geometry_msgs::Twist>("turtle1/cmd_vel", 1000);
+     sub[1] = h.subscribe("/turtle1/pose", 1000, poseCallback1);
+     pub[2] = h.advertise<geometry_msgs::Twist>("turtle2/cmd_vel", 1000);
+     sub[2] = h.subscribe("/turtle2/pose", 1000, poseCallback2);
+     pub[3] = h.advertise<geometry_msgs::Twist>("turtle3/cmd_vel", 1000);
+     sub[3] = h.subscribe("/turtle3/pose",1000,poseCallback3);
+     ros::Rate looprate(rate);
+
+     ros::service ::waitForService("spawn");
+     ros::ServiceClient add_turtle = h.serviceClient<turtlesim::Spawn>("spawn");
+     turtlesim::Spawn srv[2];
+          srv[1].request.x = rand()%12+1;
+          srv[1].request.y = rand()%12+1;
+          srv[1].request.theta = rand()%7+1;
+ 
+          srv[0].request.x = rand()%12+1;
+          srv[0].request.y = rand()%12+1;
+          srv[0].request.theta=rand()%7+1;
+
+         add_turtle.call(srv[1]);
+         add_turtle.call(srv[0]);
+
+     float goal_x[10],goal_y[10],theta[10], dx_rua[10],dy_rua[10];
+     double distance_rua[10];
+     double dalpha_rua[10];
+     const double tolerance =pow(10,-8);
+  
+         for(int i=1;i<argc;i+=6)
+         {
+             goal_x[1]=atof(argv[i]),goal_y[1]=atof(argv[i+1]);
+         
+             while (ros::ok())
+             {
+                 ros::spinOnce();
+            
+             
+                 cout<< current_pose[0].x << " " << current_pose[0].y << " " << current_pose[0].theta << endl;
+                 distance_rua[0] = sqrt( pow(goal_x[1]-current_pose[0].x, 2) + pow(goal_y[1]-current_pose[0].y, 2) );
+                  if (distance_rua[0] < tolerance) { // dừng robot 1 khi đến đủ gần
+                 pub[1].publish(getMessage(0,0));
+                 break;
+                  }
+                 dx_rua[0] = goal_x[1] - current_pose[0].x, dy_rua[0] = goal_y[1] - current_pose[0].y,theta[1] = current_pose[0].theta;
+                 dalpha_rua[0] = asin ((cos(theta[1])*dy_rua[0]-sin(theta[1])*dx_rua[0]) / distance_rua[0]);
+                  geometry_msgs::Twist msg = getMessage( min(5*distance_rua[0], 6.0), 32*dalpha_rua[0]);
+                   pub[1].publish(msg);
+            }
+         }
+
+         for(int j=3;j<argc;j+=6)
+         {
+             goal_x[2]=atof(argv[j]),goal_y[2]=atof(argv[j+1]);
+             while (ros::ok()) 
+             {
+                 ros::spinOnce();
+                    
+                 cout <<fixed << setprecision(2)<< current_pose[1].x << " " << current_pose[1].y << " " << current_pose[1].theta << endl;
+                 distance_rua[1] = sqrt( pow(goal_x[2]-current_pose[1].x, 2) + pow(goal_y[2]-current_pose[1].y, 2) );
+                 if (distance_rua[1] < tolerance) { // dừng robot 2 khi đến đủ gần
+                 pub[2].publish(getMessage(0,0));
+                 break;
+                  }
+                 dx_rua[1] = goal_x[2] - current_pose[1].x, dy_rua[1] = goal_y[2] - current_pose[1].y,theta[2] = current_pose[1].theta;
+                 dalpha_rua[1] = asin ((cos(theta[2])*dy_rua[1]-sin(theta[2])*dx_rua[1]) / distance_rua[1]);
+                 geometry_msgs::Twist msg =  getMessage( min(5*distance_rua[1], 6.0), 32*dalpha_rua[1] );
+                 pub[2].publish(msg);
+             }
+         }
+
+         for(int k=5;k<argc;k+=6)
+        {
+             goal_x[3]=atof(argv[k]),goal_y[3]=atof(argv[k+1]);
+             while (ros::ok())
+             {
+                 ros::spinOnce();
+            
+                 cout <<fixed << setprecision(2)<< current_pose[2].x << " " << current_pose[2].y << " " << current_pose[2].theta << endl;
+                  distance_rua[2] = sqrt( pow(goal_x[3]-current_pose[2].x, 2) + pow(goal_y[3]-current_pose[2].y, 2) );
+                  if (distance_rua[2] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[2].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[2] = goal_x[3] - current_pose[2].x, dy_rua[2] = goal_y[3] - current_pose[2].y,theta[3] = current_pose[2].theta;
+                 dalpha_rua[2] = asin ((cos(theta[3])*dy_rua[2]-sin(theta[3])*dx_rua[2]) / distance_rua[2]);
+                 geometry_msgs::Twist msg =   getMessage( min(5*distance_rua[2], 6.0), 32*dalpha_rua[2] );
+                 pub[3].publish(msg);
+             }
+         }    
+return 0;
+}
+
