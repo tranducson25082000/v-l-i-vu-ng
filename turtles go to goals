@@ -12,10 +12,10 @@ using namespace std;
 
 ros::Publisher pub[100];
 ros::Subscriber sub[100];
-geometry_msgs::Twist msg[3];
+geometry_msgs::Twist msg[100];
 const float PI = 3.14159265;
 float rate = 100;
-turtlesim::Pose current_pose[10];
+turtlesim::Pose current_pose[100];
 
 geometry_msgs::Twist getMessage(double linear_x, double angular_z)
 {
@@ -43,6 +43,46 @@ void poseCallback3(const turtlesim::Pose::ConstPtr& msg)
     current_pose[2] = *msg;
     
 }
+void poseCallback4(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[3] = *msg;
+    
+}
+void poseCallback5(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[4] = *msg;
+    
+}
+void poseCallback6(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[5] = *msg;
+    
+}
+void poseCallback7(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[6] = *msg;
+    
+}
+void poseCallback8(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[7] = *msg;
+    
+}
+void poseCallback9(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[8] = *msg;
+    
+}
+void poseCallback10(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[9] = *msg;
+    
+}
+void poseCallback11(const turtlesim::Pose::ConstPtr& msg)
+{
+    current_pose[10] = *msg;
+    
+}
 
 int main(int argc, char** argv)
 {
@@ -54,30 +94,135 @@ int main(int argc, char** argv)
      sub[2] = h.subscribe("/turtle2/pose", 1000, poseCallback2);
      pub[3] = h.advertise<geometry_msgs::Twist>("turtle3/cmd_vel", 1000);
      sub[3] = h.subscribe("/turtle3/pose",1000,poseCallback3);
+      pub[4] = h.advertise<geometry_msgs::Twist>("turtle4/cmd_vel", 1000);
+     sub[4] = h.subscribe("/turtle4/pose",1000,poseCallback4);
+      pub[5] = h.advertise<geometry_msgs::Twist>("turtle5/cmd_vel", 1000);
+     sub[5] = h.subscribe("/turtle5/pose",1000,poseCallback5);
+      pub[6] = h.advertise<geometry_msgs::Twist>("turtle6/cmd_vel", 1000);
+     sub[6] = h.subscribe("/turtle6/pose",1000,poseCallback6);
+      pub[7] = h.advertise<geometry_msgs::Twist>("turtle7/cmd_vel", 1000);
+     sub[7] = h.subscribe("/turtle7/pose",1000,poseCallback7);
+      pub[8] = h.advertise<geometry_msgs::Twist>("turtle8/cmd_vel", 1000);
+     sub[8] = h.subscribe("/turtle8/pose",1000,poseCallback8);
+      pub[9] = h.advertise<geometry_msgs::Twist>("turtle9/cmd_vel", 1000);
+     sub[9] = h.subscribe("/turtle9/pose",1000,poseCallback9);
+     pub[10] = h.advertise<geometry_msgs::Twist>("turtle10/cmd_vel", 1000);
+     sub[10] = h.subscribe("/turtle10/pose",1000,poseCallback10);
+      pub[11] = h.advertise<geometry_msgs::Twist>("turtle11/cmd_vel", 1000);
+     sub[11] = h.subscribe("/turtle11/pose",1000,poseCallback11);
      ros::Rate looprate(rate);
 
      ros::service ::waitForService("spawn");
      ros::ServiceClient add_turtle = h.serviceClient<turtlesim::Spawn>("spawn");
-     turtlesim::Spawn srv[2];
-          srv[1].request.x = rand()%12+1;
-          srv[1].request.y = rand()%12+1;
-          srv[1].request.theta = rand()%7+1;
+     turtlesim::Spawn srv[10];
+          srv[0].request.x = rand()%11+1;
+          srv[0].request.y = rand()%11+1;
+          srv[0].request.theta = rand()%6+1;
  
-          srv[0].request.x = rand()%12+1;
-          srv[0].request.y = rand()%12+1;
-          srv[0].request.theta=rand()%7+1;
+          srv[1].request.x = rand()%11+1;
+          srv[1].request.y = rand()%11+1;
+          srv[1].request.theta=rand()%6+1;
 
-         add_turtle.call(srv[1]);
+
+          srv[2].request.x = rand()%11+1;
+          srv[2].request.y = rand()%11+1;
+          srv[2].request.theta=rand()%6+1;
+         
+
+          srv[3].request.x = rand()%11+1;
+          srv[3].request.y = rand()%11+1;
+          srv[3].request.theta=rand()%6+1;
+
+         
+          srv[4].request.x = rand()%11+1;
+          srv[4].request.y = rand()%11+1;
+          srv[4].request.theta=rand()%6+1;
+ 
+          
+          srv[5].request.x = rand()%1+1;
+          srv[5].request.y = rand()%1+1;
+          srv[5].request.theta=rand()%1+1;
+   
+         
+          srv[6].request.x = rand()%11+1;
+          srv[6].request.y = rand()%11+1;
+          srv[6].request.theta=rand()%6+1;
+        
+          srv[7].request.x = rand()%11+1;
+          srv[7].request.y = rand()%11+1;
+          srv[7].request.theta=rand()%6+1;
+
+
+          srv[8].request.x = rand()%11+1;
+          srv[8].request.y = rand()%11+1;
+          srv[8].request.theta=rand()%6+1;
+ 
+         
+          srv[9].request.x = rand()%11+1;
+          srv[9].request.y = rand()%11+1;
+          srv[9].request.theta=rand()%6+1;
+         
+
+
          add_turtle.call(srv[0]);
+         add_turtle.call(srv[1]);
+          add_turtle.call(srv[2]);
+         add_turtle.call(srv[3]);
+          add_turtle.call(srv[4]);
+         add_turtle.call(srv[5]);
+         add_turtle.call(srv[6]);
+         add_turtle.call(srv[7]);
+          add_turtle.call(srv[8]);
+         add_turtle.call(srv[9]);
+        
+         
 
-     float goal_x[10],goal_y[10],theta[10], dx_rua[10],dy_rua[10];
-     double distance_rua[10];
-     double dalpha_rua[10];
+     float goal_x[100],goal_y[100],theta[100], dx_rua[100],dy_rua[100];
+     double distance_rua[100];
+     double dalpha_rua[100];
      const double tolerance =pow(10,-8);
   
-         for(int i=1;i<argc;i+=6)
+         for(int i=1;i<argc;i+=23)
          {
              goal_x[1]=atof(argv[i]),goal_y[1]=atof(argv[i+1]);
+        for(int j=3;j<argc;j+=23)
+         {
+             goal_x[2]=atof(argv[j]),goal_y[2]=atof(argv[j+1]);
+           for(int k=5;k<argc;k+=23)
+        {
+             goal_x[3]=atof(argv[k]),goal_y[3]=atof(argv[k+1]);
+        
+          for(int k1=7;k1<argc;k1+=23)
+        {
+             goal_x[4]=atof(argv[k1]),goal_y[4]=atof(argv[k1+1]);
+        
+          for(int k2=9;k2<argc;k2+=23)
+        {
+             goal_x[5]=atof(argv[k2]),goal_y[5]=atof(argv[k2+1]);
+              
+         
+          for(int k3=11;k3<argc;k3+=23)
+        {
+             goal_x[6]=atof(argv[k3]),goal_y[6]=atof(argv[k3+1]);
+        
+           for(int k4=13;k4<argc;k4+=23)
+        {
+             goal_x[7]=atof(argv[k4]),goal_y[7]=atof(argv[k4+1]);
+             for(int k5=15;k5<argc;k5+=23)
+        {
+             goal_x[8]=atof(argv[k5]),goal_y[8]=atof(argv[k5+1]);
+              
+             for(int k6=17;k6<argc;k6+=23)
+        {
+             goal_x[9]=atof(argv[k6]),goal_y[9]=atof(argv[k6+1]);
+          
+             for(int k7=19;k7<argc;k7+=23)
+        {
+             goal_x[10]=atof(argv[k7]),goal_y[10]=atof(argv[k7+1]);
+         
+             for(int k8=21;k8<argc;k8+=23)
+        {
+             goal_x[11]=atof(argv[k8]),goal_y[11]=atof(argv[k8+1]);    
          
              while (ros::ok())
              {
@@ -92,17 +237,12 @@ int main(int argc, char** argv)
                   }
                  dx_rua[0] = goal_x[1] - current_pose[0].x, dy_rua[0] = goal_y[1] - current_pose[0].y,theta[1] = current_pose[0].theta;
                  dalpha_rua[0] = asin ((cos(theta[1])*dy_rua[0]-sin(theta[1])*dx_rua[0]) / distance_rua[0]);
-                  geometry_msgs::Twist msg = getMessage( min(5*distance_rua[0], 6.0), 32*dalpha_rua[0]);
-                   pub[1].publish(msg);
-            }
-         }
+                
+                   pub[1].publish(getMessage( min(5*distance_rua[0], 6.0), 32*dalpha_rua[0]));
+               
+            
+         
 
-         for(int j=3;j<argc;j+=6)
-         {
-             goal_x[2]=atof(argv[j]),goal_y[2]=atof(argv[j+1]);
-             while (ros::ok()) 
-             {
-                 ros::spinOnce();
                     
                  cout <<fixed << setprecision(2)<< current_pose[1].x << " " << current_pose[1].y << " " << current_pose[1].theta << endl;
                  distance_rua[1] = sqrt( pow(goal_x[2]-current_pose[1].x, 2) + pow(goal_y[2]-current_pose[1].y, 2) );
@@ -112,30 +252,132 @@ int main(int argc, char** argv)
                   }
                  dx_rua[1] = goal_x[2] - current_pose[1].x, dy_rua[1] = goal_y[2] - current_pose[1].y,theta[2] = current_pose[1].theta;
                  dalpha_rua[1] = asin ((cos(theta[2])*dy_rua[1]-sin(theta[2])*dx_rua[1]) / distance_rua[1]);
-                 geometry_msgs::Twist msg =  getMessage( min(5*distance_rua[1], 6.0), 32*dalpha_rua[1] );
-                 pub[2].publish(msg);
-             }
-         }
+               pub[2].publish(getMessage( min(5*distance_rua[1], 6.0), 32*dalpha_rua[1]));
+             
+         
 
-         for(int k=5;k<argc;k+=6)
-        {
-             goal_x[3]=atof(argv[k]),goal_y[3]=atof(argv[k+1]);
-             while (ros::ok())
-             {
-                 ros::spinOnce();
             
                  cout <<fixed << setprecision(2)<< current_pose[2].x << " " << current_pose[2].y << " " << current_pose[2].theta << endl;
                   distance_rua[2] = sqrt( pow(goal_x[3]-current_pose[2].x, 2) + pow(goal_y[3]-current_pose[2].y, 2) );
                   if (distance_rua[2] < tolerance) { // dừng robot 3 khi đến đủ gần
-                 pub[2].publish(getMessage(0,0));
+                 pub[3].publish(getMessage(0,0));
                  break;}
                   
                  dx_rua[2] = goal_x[3] - current_pose[2].x, dy_rua[2] = goal_y[3] - current_pose[2].y,theta[3] = current_pose[2].theta;
                  dalpha_rua[2] = asin ((cos(theta[3])*dy_rua[2]-sin(theta[3])*dx_rua[2]) / distance_rua[2]);
-                 geometry_msgs::Twist msg =   getMessage( min(5*distance_rua[2], 6.0), 32*dalpha_rua[2] );
-                 pub[3].publish(msg);
+              
+                 pub[3].publish(getMessage( min(5*distance_rua[2], 6.0), 32*dalpha_rua[2]));
+             
+       
+            
+                 cout <<fixed << setprecision(2)<< current_pose[3].x << " " << current_pose[3].y << " " << current_pose[3].theta << endl;
+                  distance_rua[3] = sqrt( pow(goal_x[4]-current_pose[3].x, 2) + pow(goal_y[4]-current_pose[3].y, 2) );
+                  if (distance_rua[3] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[4].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[3] = goal_x[4] - current_pose[3].x, dy_rua[3] = goal_y[4] - current_pose[3].y,theta[4] = current_pose[3].theta;
+                 dalpha_rua[3] = asin ((cos(theta[4])*dy_rua[3]-sin(theta[4])*dx_rua[3]) / distance_rua[3]);
+               
+                 pub[4].publish(getMessage( min(5*distance_rua[3], 6.0), 32*dalpha_rua[3]));
+             
+          
+
+            
+                 cout <<fixed << setprecision(2)<< current_pose[4].x << " " << current_pose[4].y << " " << current_pose[4].theta << endl;
+                  distance_rua[4] = sqrt( pow(goal_x[5]-current_pose[4].x, 2) + pow(goal_y[5]-current_pose[4].y, 2) );
+                  if (distance_rua[4] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[5].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[4] = goal_x[5] - current_pose[4].x, dy_rua[4] = goal_y[5] - current_pose[4].y,theta[5] = current_pose[4].theta;
+                 dalpha_rua[4] = asin ((cos(theta[5])*dy_rua[4]-sin(theta[5])*dx_rua[4]) / distance_rua[4]);
+              
+                 pub[5].publish(getMessage( min(5*distance_rua[4], 6.0), 32*dalpha_rua[4]));
+             
+       
+                 cout <<fixed << setprecision(2)<< current_pose[5].x << " " << current_pose[5].y << " " << current_pose[5].theta << endl;
+                  distance_rua[5] = sqrt( pow(goal_x[6]-current_pose[5].x, 2) + pow(goal_y[6]-current_pose[5].y, 2) );
+                  if (distance_rua[5] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[6].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[5] = goal_x[6] - current_pose[5].x, dy_rua[5] = goal_y[6] - current_pose[5].y,theta[6] = current_pose[5].theta;
+                 dalpha_rua[5] = asin ((cos(theta[6])*dy_rua[6]-sin(theta[6])*dx_rua[5]) / distance_rua[5]);
+                
+                 pub[6].publish(getMessage( min(5*distance_rua[5], 6.0), 32*dalpha_rua[5]));
+        
+          
+
+                 cout <<fixed << setprecision(2)<< current_pose[6].x << " " << current_pose[6].y << " " << current_pose[6].theta << endl;
+                  distance_rua[6] = sqrt( pow(goal_x[7]-current_pose[6].x, 2) + pow(goal_y[7]-current_pose[6].y, 2) );
+                  if (distance_rua[6] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[7].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[6] = goal_x[7] - current_pose[6].x, dy_rua[6] = goal_y[7] - current_pose[6].y,theta[7] = current_pose[6].theta;
+                 dalpha_rua[6] = asin ((cos(theta[7])*dy_rua[6]-sin(theta[7])*dx_rua[6]) / distance_rua[6]);
+                
+                 pub[7].publish(getMessage( min(5*distance_rua[6], 6.0), 32*dalpha_rua[6]));
+             
+       
+                 cout <<fixed << setprecision(2)<< current_pose[7].x << " " << current_pose[7].y << " " << current_pose[7].theta << endl;
+                  distance_rua[7] = sqrt( pow(goal_x[8]-current_pose[7].x, 2) + pow(goal_y[8]-current_pose[7].y, 2) );
+                  if (distance_rua[7] <= tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[8].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[7] = goal_x[8] - current_pose[7].x, dy_rua[7] = goal_y[8] - current_pose[7].y,theta[8] = current_pose[7].theta;
+                 dalpha_rua[7] = asin ((cos(theta[8])*dy_rua[7]-sin(theta[8])*dx_rua[7]) / distance_rua[7]);
+                 
+                 pub[8].publish(getMessage( min(5*distance_rua[7], 6.0), 32*dalpha_rua[7]));
+             
+       
+                 cout <<fixed << setprecision(2)<< current_pose[8].x << " " << current_pose[8].y << " " << current_pose[8].theta << endl;
+                  distance_rua[8] = sqrt( pow(goal_x[9]-current_pose[8].x, 2) + pow(goal_y[9]-current_pose[8].y, 2) );
+                  if (distance_rua[8] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[9].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[8] = goal_x[9] - current_pose[8].x, dy_rua[8] = goal_y[9] - current_pose[8].y,theta[9] = current_pose[8].theta;
+                 dalpha_rua[8] = asin ((cos(theta[9])*dy_rua[8]-sin(theta[9])*dx_rua[8]) / distance_rua[8]);
+               
+                 pub[9].publish(getMessage( min(5*distance_rua[8], 6.0), 32*dalpha_rua[8]));
+             
+          
+        
+                 cout <<fixed << setprecision(2)<< current_pose[9].x << " " << current_pose[9].y << " " << current_pose[9].theta << endl;
+                  distance_rua[9] = sqrt( pow(goal_x[10]-current_pose[9].x, 2) + pow(goal_y[10]-current_pose[9].y, 2) );
+                  if (distance_rua[9] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[10].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[9] = goal_x[10] - current_pose[9].x, dy_rua[9] = goal_y[10] - current_pose[9].y,theta[10] = current_pose[9].theta;
+                 dalpha_rua[9] = asin ((cos(theta[10])*dy_rua[9]-sin(theta[10])*dx_rua[9]) / distance_rua[9]);
+               
+                 pub[10].publish(getMessage( min(5*distance_rua[9], 6.0), 32*dalpha_rua[9]));
+             
+
+                 cout <<fixed << setprecision(2)<< current_pose[10].x << " " << current_pose[10].y << " " << current_pose[10].theta << endl;
+                  distance_rua[10] = sqrt( pow(goal_x[11]-current_pose[10].x, 2) + pow(goal_y[11]-current_pose[10].y, 2) );
+                  if (distance_rua[10] < tolerance) { // dừng robot 3 khi đến đủ gần
+                 pub[11].publish(getMessage(0,0));
+                 break;}
+                  
+                 dx_rua[10] = goal_x[11] - current_pose[10].x, dy_rua[10] = goal_y[11] - current_pose[10].y,theta[11] = current_pose[10].theta;
+                 dalpha_rua[10] = asin ((cos(theta[11])*dy_rua[10]-sin(theta[11])*dx_rua[10]) / distance_rua[10]);
+                
+                 pub[11].publish(getMessage( min(5*distance_rua[10], 6.0), 32*dalpha_rua[10]));
+               
+      
              }
-         }    
+        }
+        }}}}}}}}
+         } 
+         }   
+
+
 return 0;
 }
+
 
