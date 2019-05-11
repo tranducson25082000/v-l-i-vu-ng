@@ -10,7 +10,7 @@ using namespace std;
 
 ros::Publisher pub;
 const float PI = 3.14159265;
-float rate = 200;
+float rate = 600;
 turtlesim::Pose current_pose;
 
 geometry_msgs::Twist getMessage(double linear_x, double angular_z)
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
      {
          double x0=atof(argv[i]);
          double y0=atof(argv[i+1]);
-         const double tolerance =pow(10,-8);
+         const double tolerance =1e-3;
          cout<<"argv:"<<argv;
         //  tinh goc luc di den diem cua rua
          double dx0 = x0 - current_pose.x, dy0 = y0 - current_pose.y, theta0 = current_pose.theta;
@@ -66,8 +66,9 @@ int main(int argc, char** argv)
              }
              double dx = x0 - current_pose.x, dy = y0 - current_pose.y, theta = current_pose.theta;
              double dalpha = asin ((cos(theta)*dy-sin(theta)*dx) / distance);
-             pub.publish( getMessage( a*min(20*distance, 25.0), a*30*dalpha ));
+             pub.publish( getMessage( a*min(10*distance, 10.0), a*35*dalpha ));
           }
      }
 return 0;
 }
+
