@@ -1,0 +1,125 @@
+
+#include <ros/ros.h>
+#include <geometry_msgs/Twist.h>
+#include <turtlesim/Pose.h>
+#include <turtlesim/Spawn.h>
+#include <iostream>
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+const double PI = 3.14159265;
+float rate = 100;
+const double tolerance =1e-3;
+bool ended[100];
+bool first=true;
+
+geometry_msgs::Twist getMessage(double linear_x, double angular_z)
+{
+    geometry_msgs::Twist msg;
+    msg.linear.x = linear_x;
+    msg.angular.z = angular_z;
+    return msg;
+}
+
+class PoseCallback
+{
+public:
+      int turtle_idx;
+      ros::Subscriber sub;
+      turtlesim::Pose current_pose;
+
+      void callback(const turtlesim::Pose::ConstPtr &msg)
+     {    
+          cout << "turtle " << turtle_idx<< " "<<fixed<<setprecision(2)<< msg->x << " " << msg->y << endl;
+          current_pose = *msg;
+          first=false;
+     }
+     
+};
+int main(int argc, char **argv)
+{
+     ros::init(argc, argv, "myturtle_control");
+     ros::NodeHandle h;
+     ros::Publisher pub[100];
+     PoseCallback sub[100];
+
+     int n_turtle = atoi(argv[1]);
+     
+     int i = 2;
+     double target_x0[100],target_y0[100], distance[100], angle[100];
+     double a, dx[100], dy[100], theta[100], dalpha[100];
+     for (int i = 1; i < n_turtle; i++)
+     {
+         ros::service::waitForService("spawn");
+         ros::ServiceClient spawner = h.serviceClient<turtlesim::Spawn>("spawn");
+         turtlesim::Spawn turtle;
+         turtle.request.x = rand() % 12;
+         turtle.request.y = rand() % 12;
+         turtle.request.theta = 0;
+         spawner.call(turtle);
+     }
+     for (int i = 1; i <= n_turtle; i++)
+     {
+         stringstream s;
+         s << "turtle" << i;
+         string name = s.str();
+         pub[i] = h.advertise<geometry_msgs::Twist>(name + "/cmd_vel", 1000);
+         sub[i].turtle_idx = i;
+         sub[i].sub = h.subscribe(name + "/pose", 1000, &PoseCallback::callback, &sub[i]);
+     }
+     ros::Rate loopRate(rate);
+    
+     for (int i = 0; i < 50; i++)//danh  gia diem nao di 
+     {
+       ended[i] = true;
+     }
+     while (ros::ok())
+     {    
+      
+             loopRate.sleep();
+             ros::spinOnce();
+             if(!first)
+             {
+                  for (int j = 1; j <= n_turtle; j++)
+                 {
+              
+                     if (ended[j])
+                     {
+                         if (i >= argc){ }
+                         else
+                         {
+                             target_x0[j] = atof(argv[i]);
+                             target_y0[j] = atof(argv[i + 1]);
+                             i += 2;
+                             ended[j] = false;//khi chua hoan thanh nhiem vu thi di tiep nhiem vu
+                         }
+                     }
+                     else
+                     {
+                         dx[j] =target_x0[j] - sub[j].current_pose.x, dy[j] = target_y0[j] - sub[j].current_pose.y, theta[j] = sub[j].current_pose.theta;
+                         distance[j] = sqrt(pow(dx[j], 2) + pow(dy[j], 2));
+                         if (distance[j] < tolerance)
+                         {
+                             pub[j].publish(getMessage(0, 0));
+                             ended[j] = true;//di xong thi ket thuc qua trinh va di tiep 
+                             break;
+                         }
+                         else
+                         {
+                           
+                             angle[j]=acos((cos(theta[j]) * dx[j] + sin(theta[j]) * dy[j]) / distance[j]);
+                             if(angle[j]<PI/2){ a=1;}
+                             else a=-1;
+                             dalpha[j] = asin((cos(theta[j]) * dy[j] - sin(theta[j]) * dx[j]) / distance[j]);
+                             pub[j].publish(getMessage(a*min(18*distance[j], 20.0), 20*a* dalpha[j]));
+                          }
+                     }
+                }
+             }
+    }
+
+      
+    return 0;
+}
