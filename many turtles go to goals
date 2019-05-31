@@ -109,7 +109,7 @@ int main(int argc, char **argv)
                          else
                          {
                            
-                             angle[j]=acos((cos(theta[j]) * dx[j] + sin(theta[j]) * dy[j]) / distance[j]);
+                             angle[j]=acos((cos(theta[j]) * dx[j] + sin(theta[j]) * dy[j]) / distance[j]);//tinh xem rua dang o goc nao
                              if(angle[j]<PI/2){ a=1;}
                              else a=-1;
                              dalpha[j] = asin((cos(theta[j]) * dy[j] - sin(theta[j]) * dx[j]) / distance[j]);
