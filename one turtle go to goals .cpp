@@ -66,7 +66,7 @@ int main(int argc, char** argv)
              
              double dx = x0 - current_pose.x, dy = y0 - current_pose.y, theta = current_pose.theta;
           
-             double angle  = acos ((cos(theta)*dx+sin(theta)*dy) / distance);
+             double angle  = acos ((cos(theta)*dx+sin(theta)*dy) / distance);//tinh xem rua dang o dau
              
              if (angle < PI/2) {  a = 1;}
              else a=-1;
