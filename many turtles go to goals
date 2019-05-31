@@ -44,9 +44,9 @@ int main(int argc, char **argv)
      ros::NodeHandle h;
      ros::Publisher pub[100];
      PoseCallback sub[100];
-
+    //  double t0= ros::Time::now().toSec();
      int n_turtle = atoi(argv[1]);
-     
+     double k=n_turtle;
      int i = 2;
      double target_x0[100],target_y0[100], distance[100], angle[100];
      double a, dx[100], dy[100], theta[100], dalpha[100];
@@ -74,20 +74,22 @@ int main(int argc, char **argv)
      for (int i = 0; i < 50; i++)//danh  gia diem nao di 
      {
        ended[i] = true;
+     
      }
      while (ros::ok())
      {    
-      
+     
              loopRate.sleep();
              ros::spinOnce();
+            
              if(!first)
-             {
+             {   
                   for (int j = 1; j <= n_turtle; j++)
                  {
               
                      if (ended[j])
                      {
-                         if (i >= argc){ }
+                         if (i >= argc){}
                          else
                          {
                              target_x0[j] = atof(argv[i]);
@@ -103,23 +105,38 @@ int main(int argc, char **argv)
                          if (distance[j] < tolerance)
                          {
                              pub[j].publish(getMessage(0, 0));
+                             k--;
                              ended[j] = true;//di xong thi ket thuc qua trinh va di tiep 
+                           
                              break;
+                             
+                           
+                            
                          }
                          else
                          {
                            
-                             angle[j]=acos((cos(theta[j]) * dx[j] + sin(theta[j]) * dy[j]) / distance[j]);//tinh xem rua dang o goc nao
+                             angle[j]=acos((cos(theta[j]) * dx[j] + sin(theta[j]) * dy[j]) / distance[j]);
+                            //  tinh xem rua dang o dau
                              if(angle[j]<PI/2){ a=1;}
                              else a=-1;
                              dalpha[j] = asin((cos(theta[j]) * dy[j] - sin(theta[j]) * dx[j]) / distance[j]);
-                             pub[j].publish(getMessage(a*min(18*distance[j], 20.0), 20*a* dalpha[j]));
+                             pub[j].publish(getMessage(a*min(5*distance[j], 6.0), 20*a* dalpha[j]));
                           }
+                          
                      }
+                  
+                  
                 }
+               if(k==0){break;}
              }
+            
+
     }
 
       
     return 0;
 }
+
+
+
