@@ -44,8 +44,8 @@ int main(int argc, char** argv)
      double a;
      for(int i=1;i<argc;i+=2)
      {   
-         double x0=atof(argv[i]);
-         double y0=atof(argv[i+1]);
+         double target_x0=atof(argv[i]);
+         double target_y0=atof(argv[i+1]);
      
          cout<<"argv:"<<argv;
          while (ros::ok())
@@ -55,7 +55,7 @@ int main(int argc, char** argv)
              if(!firstTime)
              {
              cout <<fixed<<setprecision(2)<< current_pose.x << " " << current_pose.y << " " << current_pose.theta << endl;
-             double distance = sqrt( pow(x0-current_pose.x, 2) + pow(y0-current_pose.y, 2) );
+             double distance = sqrt( pow(target_x0-current_pose.x, 2) + pow(target_y0-current_pose.y, 2) );
            
              if (distance < tolerance) { 
                 pub.publish(getMessage(0,0));
@@ -64,9 +64,9 @@ int main(int argc, char** argv)
                 break;
              }
              
-             double dx = x0 - current_pose.x, dy = y0 - current_pose.y, theta = current_pose.theta;
+             double dx = target_x0 - current_pose.x, dy = target_y0 - current_pose.y, theta = current_pose.theta;
           
-             double angle  = acos ((cos(theta)*dx+sin(theta)*dy) / distance);//tinh xem rua dang o dau
+             double angle  = acos ((cos(theta)*dx+sin(theta)*dy) / distance);//tinh xem goc o vi tri nao
              
              if (angle < PI/2) {  a = 1;}
              else a=-1;
@@ -80,3 +80,4 @@ int main(int argc, char** argv)
      
 return 0;
 }
+
