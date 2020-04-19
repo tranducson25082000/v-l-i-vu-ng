@@ -1,0 +1,270 @@
+#include <Servo.h>   //khai báo thư viện servo     
+#include <NewPing.h>//khai báo thư viện tránh vật cản
+int S_A = 11; //băm xung động cơ A
+int S_B = 11;//băm xung động cơ B
+int x = 0;//khai báo dữ liệu truyền
+int R_S = A2; //khai báo chân out phải cuả dò line
+int S_S = A1; //khai báo chân out giữa cuả dò line
+int L_S = A0; //khai báo chân out trái cuả dò line
+int distance = 100;//khai báo khoảng cách là 100cm
+#define trig_pin A3 //chân trig của tránh vật
+#define echo_pin A4 //chân echo của tránh vật
+#define maximum_distance 200//mặc định khoảng cách lớn nhất là 200cm
+boolean goesForward = false;//phủ nhận hàm đi thẳng
+NewPing sonar(trig_pin, echo_pin, maximum_distance); //thao tác khởi chạy newping
+Servo servo_motor; //thao tác khởi chạy servo
+void setup() {
+ 
+  pinMode(4, OUTPUT);//Set chân in1 của dc A là output
+  pinMode(5, OUTPUT);//Set chân in2 của dc A là output
+  pinMode(6, OUTPUT);//Set chân in1 của dc B là output
+  pinMode(7, OUTPUT);//Set chân in2 của dc B là output
+  pinMode(11,OUTPUT);//chân băm xung cho 2 motor
+  pinMode(12, OUTPUT);//khai báo out của còi buzzer
+  analogWrite(S_A, 150); // tốc độ  động cơ A
+  analogWrite(S_B, 150); //tốc độ động cơ B
+  pinMode(L_S, INPUT); //Set chân out trái  của dò line là input
+  pinMode(S_S, INPUT);//Set chân out giữa  của dò line là input
+  pinMode(R_S, INPUT);//Set chân out phải  của dò line là input
+  servo_motor.attach(9);//Set chân  out của  servo
+  servo_motor.write(115);//khởi tạo góc ban đầu cho servo 
+  delay(2000);//delay có nhiệm vụ dừng chương trình trong thời gian mili giây
+  distance = readPing();//đọc khoảng cách
+  delay(100);
+  
+  //khi bậtcông tắc robot đứng yên trước
+  digitalWrite(4, 0);
+  digitalWrite(5, 0);
+  digitalWrite(6, 0);
+  digitalWrite(7, 0);
+  Serial.begin(9600); // giao tiếp Serial với baudrate 9600
+  
+}
+
+void loop() {
+  
+  bluetoothRobot();
+ 
+}
+
+void bluetoothRobot()//hàm điều khiển bluetooth
+{
+  if (Serial.available() > 0) {
+    
+    x = Serial.read();//đọc tín hiệu truyền từ điện thoại
+  }
+  switch (x)
+  {
+    case 'a':
+      Tien();
+      
+      break;
+    case 'b':
+      Lui();
+      
+      break;
+    case 'c':
+      Retrai();
+      break;
+    case 'd':
+      Rephai();
+      break;
+    case 'e':
+      Dung();
+      break;
+    case 'o':
+     doline();
+      break;
+     case 'v':
+     vatcan();
+      break;
+}
+     
+  }
+void doline()//hàm dò đường
+{
+  while(x!='e')//khi không phải nút 'e'thì robot sẽ dò đường
+  {   //khi cảm biến sáng thì nó sẽ nhận giá trị bằng 0,nếu cảm biến không sáng 
+      if ((digitalRead(L_S) == 0)&&(digitalRead(S_S) == 1)&&(digitalRead(R_S) == 0)){Tien();}
+      if ((digitalRead(L_S) == 1)&&(digitalRead(S_S) == 1)&&(digitalRead(R_S) == 0)){Retrai();}
+      if ((digitalRead(L_S) == 1)&&(digitalRead(S_S) == 0)&&(digitalRead(R_S) == 0)){Retrai();}
+      if ((digitalRead(L_S) == 0)&&(digitalRead(S_S) == 1)&&(digitalRead(R_S) == 1)){Rephai();}
+      if ((digitalRead(L_S) == 0)&&(digitalRead(S_S) == 0)&&(digitalRead(R_S) == 1)){Rephai();}
+      if ((digitalRead(L_S) == 1)&&(digitalRead(S_S) == 1)&&(digitalRead(R_S) == 1)){Dung();}
+      if (Serial.available() > 0) {
+        x = Serial.read();//đọc tín hiệu truyền từ điện thoại
+        }
+      if (x=='e'){break;}// thoát dò line và robot dừng
+}
+}
+void vatcan(){//hàm tránh vật cản
+  while (x!='e'){//khi không phải nút 'e'thì robot sẽ dò đường
+     
+   int distanceRight = 0;//khai báo khoảng cách bên phải
+   int distanceLeft = 0;//khai báo khoảng cách bên phải
+   delay(50);
+   if (distance <= 25)//điều kiện khoảng cách để tránh vật
+ {
+   digitalWrite(12, HIGH); //còi kêu
+   Dung();//robot dừng
+   delay(300);
+   Backward();//robot lùi
+   delay(400);
+   Dung();//robot dừng
+   delay(300);
+   distanceRight = servoRight();//servo quay sang phải và ra khoảng cách bên phải
+   delay(300);
+   distanceLeft = servoLeft();//servo quay sang trái và ra khoảng cách bên trái
+   delay(300);
+
+   if (distance >= distanceLeft)//nếu khoảng cách bên trái nhỏ hơn bằng khoảng cách giới hạn thì robot quay phải
+     {
+      turnRight();
+      Dung();
+     }
+   else{//nếu khoảng cách bên trái lớn hơn hơn khoảng cách giới hạn thì robot quay trái
+      turnLeft();
+      Dung();
+       }
+ }
+   else//nếu khoảng cách lớn hơn >25 thì robot sẽ đi thẳng.
+   {  digitalWrite(12, LOW); //còi tắt
+      Forward(); 
+   }
+    distance = readPing();//cảm biến đọc khoảng cách
+     if (Serial.available() > 0) {
+        x = Serial.read(); //đọc tín hiệu truyền từ điện thoại
+        }
+      if (x=='e'){break;}//còn khi là nút 'e' thì robot sẽ dừng
+      if(x=='a'){
+        Tien();
+        //break;
+      }
+      if(x=='b')
+      {
+        Lui();
+        //break;
+      }
+      if(x=='c')
+      {
+        Retrai();
+        //break;
+      }
+      if(x=='d')
+      {
+        Rephai();
+        //break;
+      }
+  }
+}
+
+int servoRight(){//servo quay phải
+  servo_motor.write(50);//góc quay của servo là 50
+  delay(500);
+  int distance = readPing();//đọc khoảng cách
+  delay(100);
+  servo_motor.write(115);//servo quay về vị trí ban đầu
+  return distance;//trả về khoảng cách
+}
+
+int servoLeft(){//servo quay trái
+  servo_motor.write(170);//góc quay của servo là 170
+  delay(500);
+  int distance = readPing();//đọc khoảng cách
+  delay(100);
+  servo_motor.write(115);//servo quay về vị trí ban đầu
+  return distance;//trả về khoảng cách
+  delay(100);
+}
+
+int readPing(){//hàm đọc khoảng cách
+  delay(70);
+  int cm = sonar.ping_cm();//Gửi ping, trả về khoảng cách tính bằng centimet 
+  if (cm==0){
+    cm=250;
+  }
+  return cm;
+}
+void Forward(){//hàm đi thẳng//
+  
+  if(!goesForward){//nếu khác điều kiện đầu xe không đi thẳng//
+
+   goesForward=true;
+        digitalWrite(4, 1);//motor quay chiều tiến
+        digitalWrite(5, 0);//chiều còn lại nghỉ
+        digitalWrite(6, 1);//motor quay chiều tiến
+        digitalWrite(7, 0);//chiều còn lại nghỉ
+}
+}
+void Backward(){
+        goesForward=false;
+        digitalWrite(4, 0);//chiều còn lại nghỉ
+        digitalWrite(5, 1);//motor quay chiều lùi
+        digitalWrite(6, 0);//chiều còn lại nghỉ
+        digitalWrite(7, 1);//motor quay chiều lùi
+}
+
+void turnRight(){
+        digitalWrite(4, 1);//motor quay chiều tiến
+
+        digitalWrite(5, 0);//chiều còn lại nghỉ
+        digitalWrite(6, 0);//chiều còn lại nghỉ
+        digitalWrite(7, 1);//motor quay chiều lùi
+    delay(500);
+        digitalWrite(4, 1);//motor quay chiều tiến
+        digitalWrite(5, 0);//chiều còn lại nghỉ
+        digitalWrite(6, 1);//motor quay chiều tiến
+        digitalWrite(7, 0);//chiều còn lại nghỉ
+}
+void turnLeft(){
+
+        digitalWrite(4, 0);//chiều còn lại nghỉ
+        digitalWrite(5, 1);//motor quay chiều lùi
+        digitalWrite(6, 1);//motor quay chiều tiến
+        digitalWrite(7, 0);//chiều còn lại nghỉ
+    delay(500);
+        digitalWrite(4, 1);//motor quay chiều tiến
+        digitalWrite(5, 0);//chiều còn lại nghỉ
+        digitalWrite(6, 1);//motor quay chiều tiến
+        digitalWrite(7, 0);//chiều còn lại nghỉ
+}
+void Tien()
+{
+ 
+  digitalWrite(4, 1);//motor quay chiều tiến
+  digitalWrite(5, 0);//chiều còn lại nghỉ
+  digitalWrite(6, 1);//motor quay chiều tiến
+  digitalWrite(7, 0);//chiều còn lại nghỉ
+  
+}
+void Retrai()
+{
+ 
+  digitalWrite(4, 1);//motor quay chiều tiến
+  digitalWrite(5, 0);//chiều còn lại nghỉ
+  digitalWrite(6, 0);//motor nghỉ
+  digitalWrite(7, 0);//motor nghỉ
+}
+void Rephai()
+{
+  
+  digitalWrite(4, 0);//motor nghỉ
+  digitalWrite(5, 0);//motor nghỉ
+  digitalWrite(6, 1);//motor quay chiều tiến
+  digitalWrite(7, 0);//chiều còn lại nghỉ
+}
+void Lui()
+{
+  digitalWrite(4, 0);////chiều còn lại nghỉ
+  digitalWrite(5, 1);//motor quay chiều lùi
+  digitalWrite(6, 0);////chiều còn lại nghỉ
+  digitalWrite(7, 1);//motor quay chiều lùi
+}
+void Dung()
+{
+ 
+  digitalWrite(4, 0);//motor nghỉ
+  digitalWrite(5, 0);//motor nghỉ
+  digitalWrite(6, 0);//motor nghỉ
+  digitalWrite(7, 0);//motor nghỉ
+}
